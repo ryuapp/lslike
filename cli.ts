@@ -1,9 +1,14 @@
 import { brightBlue, brightCyan, printf } from './deps.ts'
 
+type FileInfo = {
+  name: string
+  type: string
+}
+
 export const countWords = (str: string) => {
   let len = 0
   for (let i = 0; i < str.length; i++) {
-    ;(str[i].match(/[ -~]/)) ? len += 1 : len += 2
+    (str[i].match(/[ -~]/)) ? len += 1 : len += 2
   }
   return len
 }
@@ -12,10 +17,6 @@ export const fillWithSpace = (str: string, len: number) => {
     str += ' '
   }
   return str + ' '
-}
-type FileInfo = {
-  name: string
-  type: string
 }
 export async function getFileListData() {
   let count = 0
@@ -52,6 +53,9 @@ export async function getFileListData() {
     },
   )
 }
+
+
+
 const fileListData = await getFileListData().then((c) => JSON.parse(c))
 const fileList = fileListData.list
 
@@ -61,9 +65,9 @@ const rows = Math.floor(consoleWidth / (fileListData.maxLen))
 const cols = Math.floor(fileListData.count / rows)
 const endCols = fileListData.count - (cols * rows)
 
-let line: { name: string; type: string }[] = []
-const table: { name: string; type: string }[][] = []
-const maxLength: number[] = []
+let line: Array<FileInfo> = []
+const table: FileInfo[][] = []
+const maxLength: Array<number> = []
 //console.log(fileList)
 //console.log(fileListData.maxLen)
 /*console.log(
@@ -71,7 +75,7 @@ const maxLength: number[] = []
 )*/
 
 if (cols === 0) {
-  fileList.forEach((e: { name: string; type: string }) => {
+  fileList.forEach((e: FileInfo) => {
     if (e.type === 'dir') {
       printf(brightBlue(e.name))
     } else if (e.type === 'symlink') {
@@ -95,7 +99,7 @@ if (cols === 0) {
   }
   if (endCols !== 0) {
     line = []
-    fileList.forEach((e: { name: string; type: string }) => {
+    fileList.forEach((e: FileInfo) => {
       line.push(e)
     })
     table.push(line)
@@ -106,8 +110,8 @@ if (cols === 0) {
     for (let row = 0; row <= rows; ++row) {
       if (row !== rows || col < endCols) {
         isPrint = true
-        const file: { name: string; type: string } = table[row][col]
-        const filledName = fillWithSpace(file.name, maxLength[row])
+        const file: FileInfo = table[row][col]
+        const filledName: string = fillWithSpace(file.name, maxLength[row])
         if (file.type === 'dir') {
           printf(brightBlue(filledName))
         } else if (file.type === 'symlink') {
