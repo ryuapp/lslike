@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "ls": "deno run --allow-read cli.ts"
+  },
+  "fmt": {
+    "singleQuote": true,
+    "semiColons": false
+  }
+}
