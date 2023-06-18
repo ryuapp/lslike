@@ -1,8 +1,4 @@
-import { printf } from 'https://deno.land/std@0.185.0/fmt/printf.ts'
-import {
-  brightBlue,
-  brightCyan,
-} from 'https://deno.land/std@0.185.0/fmt/colors.ts'
+import { brightBlue, brightCyan, printf } from './deps.ts'
 
 export const countWords = (str: string) => {
   let len = 0
