@@ -8,7 +8,7 @@ type FileInfo = {
 export const countWords = (str: string) => {
   let len = 0
   for (let i = 0; i < str.length; i++) {
-    (str[i].match(/[ -~]/)) ? len += 1 : len += 2
+    str[i].match(/[ -~]/) ? (len += 1) : (len += 2)
   }
   return len
 }
@@ -45,46 +45,52 @@ export async function getFileListData() {
     }
     count++
   }
-  return JSON.stringify(
-    {
-      count: count,
-      maxLen: maxLen,
-      list: fileList,
-    },
-  )
+  return JSON.stringify({
+    count: count,
+    maxLen: maxLen,
+    list: fileList,
+  })
+}
+export function printFileName(name, type) {
+  if (type === 'dir') {
+    printf(brightBlue(name))
+  } else if (type === 'symlink') {
+    printf(brightCyan(name))
+  } else {
+    printf(name)
+  }
+  printf('  ')
+}
+export function printFileList(fileList: Array<FileInfo>) {
+  fileList.forEach((file) => {
+    printFileName(file.name, file.type)
+  })
 }
 
 export async function lslike() {
   const fileListData = await getFileListData().then((c) => JSON.parse(c))
   const fileList = fileListData.list
+  const originFileList = fileList.concat()
 
   const consoleSize = Deno.consoleSize()
   const consoleWidth = consoleSize.columns
-  const rows = Math.floor(consoleWidth / (fileListData.maxLen))
+  const rows = Math.floor(consoleWidth / fileListData.maxLen)
   const cols = Math.floor(fileListData.count / rows)
-  const endCols = fileListData.count - (cols * rows)
+  const endCols = fileListData.count - cols * rows
 
   let line: Array<FileInfo> = []
   const table: FileInfo[][] = []
   const maxLength: Array<number> = []
-  //console.log(fileList)
-  //console.log(fileListData.maxLen)
-  /*console.log(
-      `ファイル数:${fileListData.count} 行:${cols} 列:${rows} 最後の行:${endCols}`,
-    )*/
+  /*console.log(fileList);
+  console.log(fileListData.maxLen);
+  console.log(
+    `ファイル数:${fileListData.count} 行:${cols} 列:${rows} 最後の行:${endCols}`
+  );*/
 
   if (cols === 0) {
-    fileList.forEach((e: FileInfo) => {
-      if (e.type === 'dir') {
-        printf(brightBlue(e.name))
-      } else if (e.type === 'symlink') {
-        printf(brightCyan(e.name))
-      } else {
-        printf(e.name)
-      }
-      printf('  ')
-    })
+    printFileList(fileList)
   } else {
+    let maxCount = 0
     for (let row = 0; row < rows; ++row) {
       line = []
       for (let col = 0; col < cols; ++col) {
@@ -93,9 +99,15 @@ export async function lslike() {
         if (isNaN(maxLength[row]) || maxLength[row] < countWords(file.name)) {
           maxLength[row] = countWords(file.name)
         }
+        maxCount += countWords(file.name) + 2
       }
       table.push(line)
     }
+    if (consoleWidth >= maxCount - 2) {
+      printFileList(originFileList)
+      return
+    }
+
     if (endCols !== 0) {
       line = []
       fileList.forEach((e: FileInfo) => {
@@ -108,16 +120,11 @@ export async function lslike() {
       isPrint = false
       for (let row = 0; row <= rows; ++row) {
         if (row !== rows || col < endCols) {
-          isPrint = true
           const file: FileInfo = table[row][col]
           const filledName: string = fillWithSpace(file.name, maxLength[row])
-          if (file.type === 'dir') {
-            printf(brightBlue(filledName))
-          } else if (file.type === 'symlink') {
-            printf(brightCyan(filledName))
-          } else {
-            printf(filledName)
-          }
+          isPrint = true
+
+          printFileName(filledName, file.type)
         }
       }
       if (isPrint && col + 1 < cols) printf('\n')
