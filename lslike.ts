@@ -2,6 +2,7 @@ import { printf } from './deps.ts'
 import { FileInfo } from './lib/file.ts'
 import { fillWithSpace } from './lib/fillWithSpace.ts'
 import { getFileListData } from './lib/getFileListData.ts'
+import { getFileTableData } from './lib/getFileTable.ts'
 import { printFileList } from './lib/printFileList.ts'
 import { printFileName } from './lib/printFileName.ts'
 
@@ -26,12 +27,24 @@ export async function lslike() {
     cols = 2
     rows = Math.floor(fileListData.count / cols)
   }
-  const endCols = fileListData.count - cols * rows
+  let endCols = fileListData.count - cols * rows
+  if (endCols > cols) {
+    cols += 1
+    rows = Math.floor(fileListData.count / cols)
+    endCols = fileListData.count - cols * rows
+  }
 
-  let line: Array<FileInfo> = []
-  const fileTable: FileInfo[][] = []
-  const maxLength: Array<number> = []
-  /*console.log(fileList)
+  const { maxLength, fileTable }: {
+    maxLength: Array<number>
+    fileTable: FileInfo[][]
+  } = getFileTableData(
+    fileList,
+    fileListCount,
+    rows,
+    cols,
+  )
+  /*
+  console.log(fileList)
   console.log(fileListData.maxLen)
   console.log(
     `ファイル数:${fileListData.count} 行:${cols} 列:${rows} 最後の行:${endCols}`,
@@ -39,25 +52,6 @@ export async function lslike() {
   console.log(consoleWidth)
   console.log(fileListLength + fileList.length)*/
 
-  for (let row = 0; row < rows; ++row) {
-    line = []
-    for (let col = 0; col < cols; ++col) {
-      const file = fileList.shift()
-      line.push(file)
-      if (isNaN(maxLength[row]) || maxLength[row] < file.length) {
-        maxLength[row] = file.length
-      }
-    }
-    fileTable.push(line)
-  }
-
-  if (endCols !== 0) {
-    line = []
-    fileList.forEach((e: FileInfo) => {
-      line.push(e)
-    })
-    fileTable.push(line)
-  }
   let isPrint = false
   for (let col = 0; col < cols; ++col) {
     isPrint = false
