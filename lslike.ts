@@ -3,6 +3,7 @@ import { brightBlue, brightCyan, printf } from './deps.ts'
 interface FileInfo {
   name: string
   type: string
+  length: number
 }
 
 export const countWords = (str: string) => {
@@ -12,11 +13,17 @@ export const countWords = (str: string) => {
   }
   return len
 }
-export const fillWithSpace = (str: string, len: number) => {
-  for (let i = countWords(str); i <= len; i++) {
-    str += ' '
+export const fillWithSpace = (file: FileInfo, len: number) => {
+  for (let i = file.length; i <= len; i++) {
+    file.name += ' '
   }
-  return str + ' '
+  return file.name
+}
+export function getFileListLength(fileList: Array<FileInfo>) {
+  let len = 0
+  fileList.forEach((file) => len += file.length)
+
+  return len
 }
 export async function getFileListData() {
   let count = 0
@@ -28,16 +35,19 @@ export async function getFileListData() {
       fileList.push({
         name: dirEntry.name,
         type: 'dir',
+        length: countWords(dirEntry.name),
       })
     } else if (dirEntry.isSymlink) {
       fileList.push({
         name: dirEntry.name,
         type: 'symlink',
+        length: countWords(dirEntry.name),
       })
     } else {
       fileList.push({
         name: dirEntry.name,
         type: 'file',
+        length: countWords(dirEntry.name),
       })
     }
     if (maxLen < countWords(dirEntry.name)) {
@@ -59,7 +69,7 @@ export function printFileName(name, type) {
   } else {
     printf(name)
   }
-  printf('  ')
+  printf(' ')
 }
 export function printFileList(fileList: Array<FileInfo>) {
   fileList.forEach((file) => {
@@ -70,64 +80,73 @@ export function printFileList(fileList: Array<FileInfo>) {
 export async function lslike() {
   const fileListData = await getFileListData().then((c) => JSON.parse(c))
   const fileList = fileListData.list
+  const fileListLength = getFileListLength(fileList)
   const originFileList = fileList.concat()
 
   const consoleSize = Deno.consoleSize()
   const consoleWidth = consoleSize.columns
-  const rows = Math.floor(consoleWidth / fileListData.maxLen)
-  const cols = Math.floor(fileListData.count / rows)
+
+  // Display files if it fits within one line.
+  if (consoleWidth > (fileListLength + fileList.length)) {
+    printFileList(fileList)
+    return
+  }
+
+  let rows = Math.floor(consoleWidth / fileListData.maxLen)
+  let cols = Math.floor(fileListData.count / rows)
+  if (cols <= 1) {
+    cols = 2
+    rows = Math.floor(fileListData.count / cols)
+  }
   const endCols = fileListData.count - cols * rows
 
   let line: Array<FileInfo> = []
-  const table: FileInfo[][] = []
+  const fileTable: FileInfo[][] = []
   const maxLength: Array<number> = []
-  /*console.log(fileList);
-  console.log(fileListData.maxLen);
+  /*console.log(fileList)
+  console.log(fileListData.maxLen)
   console.log(
-    `ファイル数:${fileListData.count} 行:${cols} 列:${rows} 最後の行:${endCols}`
-  );*/
-
-  if (cols === 0) {
-    printFileList(fileList)
-  } else {
-    let maxCount = 0
-    for (let row = 0; row < rows; ++row) {
-      line = []
-      for (let col = 0; col < cols; ++col) {
-        const file = fileList.shift()
-        line.push(file)
-        if (isNaN(maxLength[row]) || maxLength[row] < countWords(file.name)) {
-          maxLength[row] = countWords(file.name)
-        }
-        maxCount += countWords(file.name) + 2
-      }
-      table.push(line)
-    }
-    if (consoleWidth >= maxCount - 2) {
-      printFileList(originFileList)
-      return
-    }
-
-    if (endCols !== 0) {
-      line = []
-      fileList.forEach((e: FileInfo) => {
-        line.push(e)
-      })
-      table.push(line)
-    }
-    let isPrint = false
+    `ファイル数:${fileListData.count} 行:${cols} 列:${rows} 最後の行:${endCols}`,
+  )
+  console.log(consoleWidth)
+  console.log(fileListLength + fileList.length)*/
+  let maxCount = 0
+  for (let row = 0; row < rows; ++row) {
+    line = []
     for (let col = 0; col < cols; ++col) {
-      isPrint = false
-      for (let row = 0; row <= rows; ++row) {
-        if (row !== rows || col < endCols) {
-          const file: FileInfo = table[row][col]
-          const filledName: string = fillWithSpace(file.name, maxLength[row])
-          isPrint = true
-
-          printFileName(filledName, file.type)
-        }
+      const file = fileList.shift()
+      line.push(file)
+      if (isNaN(maxLength[row]) || maxLength[row] < file.length) {
+        maxLength[row] = file.length
       }
-      if (isPrint && col + 1 < cols) printf('\n')
+      maxCount += file.length + 2
     }
+    fileTable.push(line)
+  }
+  if (consoleWidth >= maxCount - 2) {
+    printFileList(originFileList)
+    return
+  }
+
+  if (endCols !== 0) {
+    line = []
+    fileList.forEach((e: FileInfo) => {
+      line.push(e)
+    })
+    fileTable.push(line)
+  }
+  let isPrint = false
+  for (let col = 0; col < cols; ++col) {
+    isPrint = false
+    for (let row = 0; row <= rows; ++row) {
+      if (row !== rows || col < endCols) {
+        const file: FileInfo = fileTable[row][col]
+        const filledName: string = fillWithSpace(file, maxLength[row])
+        isPrint = true
+
+        printFileName(filledName, file.type)
+      }
+    }
+    if (isPrint && col + 1 < cols) printf('\n')
   }
 }
