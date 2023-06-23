@@ -7,27 +7,28 @@ export async function getFileListData() {
   const fileList: Array<FileInfo> = []
 
   for await (const dirEntry of Deno.readDir('./')) {
+    const fileLength = countWords(dirEntry.name)
     if (dirEntry.isDirectory) {
       fileList.push({
         name: dirEntry.name,
         type: 'dir',
-        length: countWords(dirEntry.name),
+        length: fileLength,
       })
     } else if (dirEntry.isSymlink) {
       fileList.push({
         name: dirEntry.name,
         type: 'symlink',
-        length: countWords(dirEntry.name),
+        length: fileLength,
       })
     } else {
       fileList.push({
         name: dirEntry.name,
         type: 'file',
-        length: countWords(dirEntry.name),
+        length: fileLength,
       })
     }
-    if (maxLen < countWords(dirEntry.name)) {
-      maxLen = countWords(dirEntry.name)
+    if (maxLen < fileLength) {
+      maxLen = fileLength
     }
     count++
   }
