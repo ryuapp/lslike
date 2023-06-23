@@ -2,20 +2,20 @@ import { printf } from './deps.ts'
 import { FileInfo } from './lib/file.ts'
 import { fillWithSpace } from './lib/fillWithSpace.ts'
 import { getFileListData } from './lib/getFileListData.ts'
-import { getFileListLength } from './lib/getFileListLength.ts'
 import { printFileList } from './lib/printFileList.ts'
 import { printFileName } from './lib/printFileName.ts'
 
 export async function lslike() {
   const fileListData = await getFileListData().then((c) => JSON.parse(c))
   const fileList = fileListData.list
-  const fileListLength = getFileListLength(fileList)
+  const fileListLength = fileListData.len
+  const fileListCount = fileListData.count
 
   const consoleSize = Deno.consoleSize()
   const consoleWidth = consoleSize.columns
 
   // Display files if it fits within one line.
-  if (consoleWidth > (fileListLength + fileList.length)) {
+  if (consoleWidth > (fileListLength + fileListCount)) {
     printFileList(fileList)
     return
   }

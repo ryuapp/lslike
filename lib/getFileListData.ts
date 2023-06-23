@@ -3,37 +3,34 @@ import { FileInfo } from './file.ts'
 
 export async function getFileListData() {
   let count = 0
+  let len = 0
   let maxLen = 0
   const fileList: Array<FileInfo> = []
 
   for await (const dirEntry of Deno.readDir('./')) {
     const fileLength = countWords(dirEntry.name)
+    let type = 'file'
     if (dirEntry.isDirectory) {
-      fileList.push({
-        name: dirEntry.name,
-        type: 'dir',
-        length: fileLength,
-      })
+      type = 'dir'
     } else if (dirEntry.isSymlink) {
-      fileList.push({
-        name: dirEntry.name,
-        type: 'symlink',
-        length: fileLength,
-      })
-    } else {
-      fileList.push({
-        name: dirEntry.name,
-        type: 'file',
-        length: fileLength,
-      })
+      type = 'symlink'
     }
+
+    fileList.push({
+      name: dirEntry.name,
+      type: type,
+      length: fileLength,
+    })
+
     if (maxLen < fileLength) {
       maxLen = fileLength
     }
     count++
+    len += fileLength
   }
   return JSON.stringify({
     count: count,
+    len: len,
     maxLen: maxLen,
     list: fileList,
   })
