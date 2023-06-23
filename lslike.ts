@@ -81,8 +81,7 @@ export async function lslike() {
   const fileListData = await getFileListData().then((c) => JSON.parse(c))
   const fileList = fileListData.list
   const fileListLength = getFileListLength(fileList)
-  const originFileList = fileList.concat()
-
+  
   const consoleSize = Deno.consoleSize()
   const consoleWidth = consoleSize.columns
 
@@ -110,7 +109,7 @@ export async function lslike() {
   )
   console.log(consoleWidth)
   console.log(fileListLength + fileList.length)*/
-  let maxCount = 0
+
   for (let row = 0; row < rows; ++row) {
     line = []
     for (let col = 0; col < cols; ++col) {
@@ -119,13 +118,8 @@ export async function lslike() {
       if (isNaN(maxLength[row]) || maxLength[row] < file.length) {
         maxLength[row] = file.length
       }
-      maxCount += file.length + 2
     }
     fileTable.push(line)
-  }
-  if (consoleWidth >= maxCount - 2) {
-    printFileList(originFileList)
-    return
   }
 
   if (endCols !== 0) {
