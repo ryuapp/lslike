@@ -1,6 +1,6 @@
 import { brightBlue, brightCyan, printf } from './deps.ts'
 
-type FileInfo = {
+interface FileInfo {
   name: string
   type: string
 }
