@@ -1,6 +1,6 @@
 # lslike
-[WIP] 
-lslike is ls command for Windows with Deno🦕
+
+[WIP] lslike is ls command for Windows with Deno🦕
 
 ## Install
 
@@ -15,6 +15,7 @@ deno install --allow-read --name ls https://deno.land/x/lslike/cli.ts
 
 ```
 ls
+ls -1
 ```
 
 ## License

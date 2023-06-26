@@ -1,2 +1,5 @@
 import { lslike } from './lslike.ts'
-lslike()
+import { parse } from './deps.ts'
+
+const args = parse(Deno.args)
+lslike(args)

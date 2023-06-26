@@ -1,6 +1,6 @@
 import { brightBlue, brightCyan, printf } from '../deps.ts'
 
-export function printFileName(name: string, type: string) {
+export function printFileName(name: string, type: string, interval: boolean = true) {
   if (type === 'dir') {
     printf(brightBlue(name))
   } else if (type === 'symlink') {
@@ -8,5 +8,5 @@ export function printFileName(name: string, type: string) {
   } else {
     printf(name)
   }
-  printf(' ')
+  if (interval) printf(' ')
 }

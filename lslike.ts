@@ -6,7 +6,7 @@ import { getFileTableData } from './lib/getFileTable.ts'
 import { printFileList } from './lib/printFileList.ts'
 import { printFileName } from './lib/printFileName.ts'
 
-export async function lslike() {
+export async function lslike(args = {}) {
   const fileListData = await getFileListData().then((c) => JSON.parse(c))
   const fileList = fileListData.list
   const fileListLength = fileListData.len
@@ -15,6 +15,11 @@ export async function lslike() {
   const consoleSize = Deno.consoleSize()
   const consoleWidth = consoleSize.columns
 
+  // Display one file per column.
+  if (args['1']) {
+    printFileList(fileList, 1)
+    return
+  }
   // Display files if it fits within one line.
   if (consoleWidth > (fileListLength + fileListCount)) {
     printFileList(fileList)
