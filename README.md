@@ -1,5 +1,5 @@
 # lslike
-
+[![deno module](https://shield.deno.dev/x/lslike)](https://deno.land/x/lslike)  
 [WIP] lslike is ls command for Windows with Deno🦕
 
 ## Install
