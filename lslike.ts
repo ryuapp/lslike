@@ -1,4 +1,5 @@
 import { printf } from './deps.ts'
+import { printHelp } from './lib/print_help.ts'
 import { FileInfo } from './lib/file_info_type.ts'
 import { fillWithSpace } from './lib/fill_with_space.ts'
 import { getFileListData } from './lib/get_file_list_data.ts'
@@ -15,6 +16,11 @@ export async function lslike(args = {}) {
   const consoleSize = Deno.consoleSize()
   const consoleWidth = consoleSize.columns
 
+  // Display help
+  if (args['help']){
+    printHelp()
+    return
+  }
   // Display one file per column.
   if (args['1']) {
     printFileList(fileList, 1)

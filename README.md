@@ -16,6 +16,7 @@ deno install --allow-read --name ls https://deno.land/x/lslike/cli.ts
 ```
 ls
 ls -1
+ls --help
 ```
 
 ## License
