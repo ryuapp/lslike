@@ -1,4 +1,4 @@
-import { FileInfo } from './file.ts'
+import { FileInfo } from './file_info_type.ts'
 
 export function getFileTableData(
   fileList: Array<FileInfo>,

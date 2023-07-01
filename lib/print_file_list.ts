@@ -1,5 +1,5 @@
-import { FileInfo } from './file.ts'
-import { printFileName } from './printFileName.ts'
+import { FileInfo } from './file_info_type.ts'
+import { printFileName } from './print_file_name.ts'
 
 export function printFileList(fileList: Array<FileInfo>, option = 0) {
   if (option === 1) {

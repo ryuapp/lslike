@@ -1,5 +1,5 @@
-import { countWords } from './countWords.ts'
-import { FileInfo } from './file.ts'
+import { getFileNameLength } from './get_file_name_length.ts'
+import { FileInfo } from './file_info_type.ts'
 
 export async function getFileListData() {
   let count = 0
@@ -8,7 +8,7 @@ export async function getFileListData() {
   const fileList: Array<FileInfo> = []
 
   for await (const dirEntry of Deno.readDir('./')) {
-    const fileLength = countWords(dirEntry.name)
+    const fileLength = getFileNameLength(dirEntry.name)
     let type = 'file'
     if (dirEntry.isDirectory) {
       type = 'dir'

@@ -1,10 +1,10 @@
 import { printf } from './deps.ts'
-import { FileInfo } from './lib/file.ts'
-import { fillWithSpace } from './lib/fillWithSpace.ts'
-import { getFileListData } from './lib/getFileListData.ts'
-import { getFileTableData } from './lib/getFileTable.ts'
-import { printFileList } from './lib/printFileList.ts'
-import { printFileName } from './lib/printFileName.ts'
+import { FileInfo } from './lib/file_info_type.ts'
+import { fillWithSpace } from './lib/fill_with_space.ts'
+import { getFileListData } from './lib/get_file_list_data.ts'
+import { getFileTableData } from './lib/get_file_table_data.ts'
+import { printFileList } from './lib/print_file_list.ts'
+import { printFileName } from './lib/print_file_name.ts'
 
 export async function lslike(args = {}) {
   const fileListData = await getFileListData().then((c) => JSON.parse(c))
