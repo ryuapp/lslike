@@ -17,7 +17,7 @@ export async function lslike(args = {}) {
   const consoleWidth = consoleSize.columns
 
   // Display help
-  if (args['help']){
+  if (args['help']) {
     printHelp()
     return
   }
