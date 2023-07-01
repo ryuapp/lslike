@@ -7,7 +7,7 @@ import { getFileTableData } from './lib/get_file_table_data.ts'
 import { printFileList } from './lib/print_file_list.ts'
 import { printFileName } from './lib/print_file_name.ts'
 
-export async function lslike(args = {}) {
+export async function lslike(args: { [x: string]: boolean | string | (string | number)[] }) {
   const fileListData = await getFileListData().then((c) => JSON.parse(c))
   const fileList = fileListData.list
   const fileListLength = fileListData.len
