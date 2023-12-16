@@ -1,59 +1,61 @@
-import { printf } from './deps.ts'
-import { printHelp } from './lib/print_help.ts'
-import { FileInfo } from './lib/file_info_type.ts'
-import { fillWithSpace } from './lib/fill_with_space.ts'
-import { getFileListData } from './lib/get_file_list_data.ts'
-import { getFileTableData } from './lib/get_file_table_data.ts'
-import { printFileList } from './lib/print_file_list.ts'
-import { printFileName } from './lib/print_file_name.ts'
+import { printf } from "./deps.ts";
+import { printHelp } from "./lib/print_help.ts";
+import { FileInfo } from "./lib/types.ts";
+import { fillWithSpace } from "./lib/fill_with_space.ts";
+import { getFileListData } from "./lib/get_file_list_data.ts";
+import { getFileTableData } from "./lib/get_file_table_data.ts";
+import { printFileList } from "./lib/print_file_list.ts";
+import { printFileName } from "./lib/print_file_name.ts";
 
-export async function lslike(args: { [x: string]: boolean | string | (string | number)[] }) {
-  const fileListData = await getFileListData().then((c) => JSON.parse(c))
-  const fileList = fileListData.list
-  const fileListLength = fileListData.len
-  const fileListCount = fileListData.count
+export async function lslike(
+  args: { [x: string]: boolean | string | (string | number)[] },
+) {
+  const fileListData = await getFileListData().then((c) => JSON.parse(c));
+  const fileList = fileListData.list;
+  const fileListLength = fileListData.len;
+  const fileListCount = fileListData.count;
 
-  const consoleSize = Deno.consoleSize()
-  const consoleWidth = consoleSize.columns
+  const consoleSize = Deno.consoleSize();
+  const consoleWidth = consoleSize.columns;
 
   // Display help
-  if (args['help']) {
-    printHelp()
-    return
+  if (args["help"]) {
+    printHelp();
+    return;
   }
   // Display one file per column.
-  if (args['1']) {
-    printFileList(fileList, 1)
-    return
+  if (args["1"]) {
+    printFileList(fileList, 1);
+    return;
   }
   // Display files if it fits within one line.
   if (consoleWidth > (fileListLength + fileListCount)) {
-    printFileList(fileList)
-    return
+    printFileList(fileList);
+    return;
   }
 
-  let rows = Math.floor(consoleWidth / fileListData.maxLen)
-  let cols = Math.floor(fileListData.count / rows)
+  let rows = Math.floor(consoleWidth / fileListData.maxLen);
+  let cols = Math.floor(fileListData.count / rows);
   if (cols <= 1) {
-    cols = 2
-    rows = Math.floor(fileListData.count / cols)
+    cols = 2;
+    rows = Math.floor(fileListData.count / cols);
   }
-  let endCols = fileListData.count - cols * rows
+  let endCols = fileListData.count - cols * rows;
   if (endCols > cols) {
-    cols += 1
-    rows = Math.floor(fileListData.count / cols)
-    endCols = fileListData.count - cols * rows
+    cols += 1;
+    rows = Math.floor(fileListData.count / cols);
+    endCols = fileListData.count - cols * rows;
   }
 
   const { maxLength, fileTable }: {
-    maxLength: Array<number>
-    fileTable: FileInfo[][]
+    maxLength: Array<number>;
+    fileTable: FileInfo[][];
   } = getFileTableData(
     fileList,
     fileListCount,
     rows,
     cols,
-  )
+  );
   /*
   console.log(fileList)
   console.log(fileListData.maxLen)
@@ -63,18 +65,18 @@ export async function lslike(args: { [x: string]: boolean | string | (string | n
   console.log(consoleWidth)
   console.log(fileListLength + fileList.length)*/
 
-  let isPrint = false
+  let isPrint = false;
   for (let col = 0; col < cols; ++col) {
-    isPrint = false
+    isPrint = false;
     for (let row = 0; row <= rows; ++row) {
       if (row !== rows || col < endCols) {
-        const file: FileInfo = fileTable[row][col]
-        const filledName: string = fillWithSpace(file, maxLength[row])
-        isPrint = true
+        const file: FileInfo = fileTable[row][col];
+        const filledName: string = fillWithSpace(file, maxLength[row]);
+        isPrint = true;
 
-        printFileName(filledName, file.type)
+        printFileName(filledName, file.type);
       }
     }
-    if (isPrint && col + 1 < cols) printf('\n')
+    if (isPrint && col + 1 < cols) printf("\n");
   }
 }
